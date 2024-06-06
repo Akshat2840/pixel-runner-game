@@ -8,9 +8,8 @@ def display_score():
     screen.blit(score_surface,score_rect)
     return current_time
 
-
 def game_intro_screen():
-    screen.fill("#003566")
+    screen.fill("#003566")           
 
     heading_font = pygame.font.Font(None,60)
 
@@ -66,13 +65,15 @@ snail_rect = snail_surface.get_rect(topleft  = (400,238))
 player_surface = pygame.image.load("D:\Programming\PyGame\character.png").convert_alpha()
 player_surface_size=(58,58)
 player_surface=pygame.transform.scale(player_surface,player_surface_size)
-player_rect = player_surface.get_rect(topleft = (100,228))
+player_rect = player_surface.get_rect(topleft = (150,228))
 
-player_gravity = 0
 start_time=0
 game_active = False 
 
 score = 0
+
+player_gravity = 0
+player_velocity = 0
 
 while(True):
     for event in pygame.event.get():
@@ -82,25 +83,34 @@ while(True):
 
         if(game_active == True):
             if(event.type == pygame.KEYDOWN):
+                
                 if((event.key == pygame.K_SPACE or event.key == pygame.K_UP) and player_rect.top == 228):
                     player_gravity = -20 
 
                 if(event.key == pygame.K_RIGHT):
-                    player_rect.left += 10
+                    player_velocity = 4
 
                 if(event.key == pygame.K_LEFT):
-                    player_rect.left -= 10
+                    player_velocity = -4
 
-                
+            if(event.type == pygame.KEYUP): 
+
+                if(event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT):
+                    player_velocity = 0
+
+           
+
+
 
         else:
             if(event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
                 game_active = True
                 snail_rect.left = 600
-                player_rect.topright = (100,228)
+                player_rect.topright = (150,228)
                 start_time = int(pygame.time.get_ticks() / 1000)
 
     if(game_active == True):
+
         screen.blit(background_surface,background_rect)
 
         score = display_score()
@@ -109,8 +119,7 @@ while(True):
         snail_rect.left-=4
 
         screen.blit(player_surface,player_rect)
-        # pygame.draw.rect(screen ,(255,0,0),[100 , 228 , 10 , 10])
-
+        player_rect.right += player_velocity
 
         player_gravity += 1
         player_rect.top += player_gravity
@@ -121,6 +130,12 @@ while(True):
 
         if(player_rect.top >= 228):
             player_rect.top = 228
+
+        if(player_rect.left <= 0):
+            player_rect.left = 0
+
+        if(player_rect.right >= 600):
+            player_rect.right = 600
 
         if(snail_rect.colliderect(player_rect)):
             game_active = False
